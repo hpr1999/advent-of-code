@@ -37,7 +37,6 @@ fn is_safe(report: Vec<i32>) -> bool {
     true
 }
 
-
 fn num_safe_reports(reports: Vec<Vec<i32>>) -> usize {
     let mut safe_reports = 0;
     for report in reports {
@@ -49,12 +48,16 @@ fn num_safe_reports(reports: Vec<Vec<i32>>) -> usize {
 }
 
 fn is_safe_with_dampener(report: Vec<i32>) -> bool {
-    if is_safe(report.clone()) { return true; }
+    if is_safe(report.clone()) {
+        return true;
+    }
 
     for i in 0..report.len() {
         let mut clone = report.clone();
         clone.remove(i);
-        if is_safe(clone) { return true }
+        if is_safe(clone) {
+            return true;
+        }
     }
 
     false
