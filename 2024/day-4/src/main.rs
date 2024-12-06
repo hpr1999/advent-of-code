@@ -1,8 +1,16 @@
+use std::collections::HashMap;
+
 const INPUT: &str = include_str!("input");
 
 struct Offset {
     x: i8,
     y: i8,
+}
+
+impl Offset {
+    fn is_diagonal(&self) -> bool {
+        self.x != 0 && self.y != 0
+    }
 }
 
 const DIRECTIONS: [Offset; 8] = {
@@ -27,7 +35,7 @@ const DIRECTIONS: [Offset; 8] = {
     result
 };
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
 struct Position {
     x: usize,
     y: usize,
@@ -46,6 +54,9 @@ trait IBoard {
     fn get_positions(&self) -> Vec<Position>;
     fn get_position(&self, position: &Position) -> Option<&char>;
     fn get_string(&self, position: &Position, direction: &Offset, len: usize) -> String;
+    fn try_get_word_occurrences(&self, position: Position, word: &str) -> Vec<Match>;
+    fn get_word_occurences(&self, word: &str) -> Vec<Match>;
+    fn get_num_xmas_crosses(&self) -> usize;
 }
 
 impl IBoard for Board<'_> {
@@ -80,8 +91,49 @@ impl IBoard for Board<'_> {
                 _ => return result,
             }
         }
-
         result
+    }
+
+    fn try_get_word_occurrences(&self, position: Position, word: &str) -> Vec<Match> {
+        let mut matches = vec![];
+        for direction in DIRECTIONS {
+            let found = self.get_string(&position, &direction, word.len());
+            if found == word {
+                matches.push(Match {
+                    position,
+                    direction,
+                });
+            }
+        }
+        matches
+    }
+
+    fn get_word_occurences(&self, word: &str) -> Vec<Match> {
+        let mut matches: Vec<Match> = vec![];
+        for pos in self.get_positions() {
+            let mut occurrences = self.try_get_word_occurrences(pos, word);
+            matches.append(occurrences.as_mut());
+        }
+        matches
+    }
+    fn get_num_xmas_crosses(&self) -> usize {
+        let matches = self.get_word_occurences("MAS");
+        let matches: Vec<Match> = matches
+            .into_iter()
+            .filter(|m| m.direction.is_diagonal())
+            .collect();
+        let mut map: HashMap<Position, usize> = HashMap::new();
+
+        for m in matches {
+            if let Some(a_pos) = m.position.moved_by(&m.direction) {
+                match map.get(&a_pos) {
+                    Some(count) => map.insert(a_pos, *count + 1),
+                    _ => map.insert(a_pos, 1),
+                };
+            }
+        }
+
+        map.iter().filter(|(_, &count)| count > 1).count()
     }
 }
 
@@ -90,44 +142,20 @@ struct Match {
     direction: Offset,
 }
 
-fn try_get_word_occurrences(board: &Board, position: Position, word: &str) -> Vec<Match> {
-    let mut matches = vec![];
-    for direction in DIRECTIONS {
-        let found = board.get_string(&position, &direction, word.len());
-        if found == word {
-            matches.push(Match {
-                position,
-                direction,
-            })
-        }
-    }
-    matches
-}
-
-fn get_word_occurences(board: &Board, word: &str) -> Vec<Match> {
-    let mut matches: Vec<Match> = vec![];
-    for pos in board.get_positions() {
-        matches.append(&mut try_get_word_occurrences(&board, pos, word));
-    }
-    matches
-}
-
 fn parse_board(input: &str) -> Board {
     input.lines().map(|line| line.chars().collect()).collect()
 }
 
 fn main() {
     let board = parse_board(INPUT);
-    println!("Part 1: {}", get_word_occurences(&board, "XMAS").len());
+    println!("Part 1: {}", board.get_word_occurences("XMAS").len());
+    println!("Part 2: {}", board.get_num_xmas_crosses());
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_part1() {
-        let input = "\
+    const INPUT: &str = "\
 MMMSXXMASM
 MSAMXMSMSA
 AMXSXMAAMM
@@ -138,7 +166,15 @@ SMSMSASXSS
 SAXAMASAAA
 MAMMMXMMMM
 MXMXAXMASX";
-        let board: Board = parse_board(input);
-        assert_eq!(get_word_occurences(&board, "XMAS").len(), 18);
+
+    #[test]
+    fn test_part1() {
+        let board: Board = parse_board(INPUT);
+        assert_eq!(board.get_word_occurences("XMAS").len(), 18);
+    }
+    #[test]
+    fn test_part2() {
+        let board: Board = parse_board(INPUT);
+        assert_eq!(board.get_num_xmas_crosses(), 9);
     }
 }
