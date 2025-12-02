@@ -4,6 +4,6 @@ defmodule AocElixir do
   """
 
   def read_input(num) when is_number(num) do
-    File.read!(~s"./inputs/day_#{num}.txt")
+    String.trim(File.read!(~s"./inputs/day_#{num}.txt"))
   end
 end
