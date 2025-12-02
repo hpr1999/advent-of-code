@@ -3,9 +3,7 @@ defmodule AocElixir do
   Utilities for all advent of code.
   """
 
-  @doc """
-  """
-  def hello do
-    :world
+  def read_input(num) when is_number(num) do
+    File.read!(~s"./inputs/day_#{num}.txt")
   end
 end

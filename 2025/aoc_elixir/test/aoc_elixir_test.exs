@@ -2,7 +2,7 @@ defmodule AocElixirTest do
   use ExUnit.Case
   doctest AocElixir
 
-  test "greets the world" do
-    assert AocElixir.hello() == :world
+  test "reading files works" do
+    Enum.each(1..2, fn num -> AocElixir.read_input(num) end)
   end
 end
