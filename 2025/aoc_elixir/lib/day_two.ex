@@ -4,25 +4,56 @@ defmodule DayTwo do
   """
   require Integer
 
-  def is_invalid_id(id) when is_number(id) do
-    is_invalid_id(Integer.to_string(id))
+  def is_invalid_id_part_one(id) when is_number(id) do
+    is_invalid_id_part_one(Integer.to_string(id))
   end
 
-  def is_invalid_id(id) when is_binary(id) do
+  def is_invalid_id_part_one(id) when is_binary(id) do
     length = String.length(id)
 
     if rem(length, 2) == 0 do
-      {left, right} = split_in_middle(id)
-      left === right
+      is_invalid_id_with_repeat_length(id, 2)
     else
       false
     end
   end
 
   def split_in_middle(str) do
-    length = String.length(str)
-    middle_index = div(String.length(str), 2) - 1
-    {String.slice(str, 0..middle_index), String.slice(str, (middle_index + 1)..length)}
+    middle_index = div(String.length(str), 2)
+    String.split_at(str, middle_index)
+  end
+
+  def is_invalid_id_part_two(id) when is_number(id) do
+    is_invalid_id_part_two(Integer.to_string(id))
+  end
+
+  def is_invalid_id_part_two(id) when is_binary(id) do
+    length = String.length(id)
+
+    1..length
+    |> Enum.map(fn len -> is_invalid_id_with_repeat_length(id, len) end)
+    |> Enum.any?()
+  end
+
+  def is_invalid_id_with_repeat_length(id, len) do
+    length = String.length(id)
+
+    if rem(length, len) == 0 do
+      [first_part | parts] = split_multiple(id, div(length, len))
+      Enum.any?(parts) and Enum.all?(parts, &(first_part === &1))
+    else
+      false
+    end
+  end
+
+  def split_multiple(str, len) do
+    {left, right} = String.split_at(str, len)
+
+    if String.length(right) < len do
+      [left]
+    else
+      [left | split_multiple(right, len)]
+    end
   end
 
   def parse_range(id_range) do
@@ -30,25 +61,30 @@ defmodule DayTwo do
     String.to_integer(left)..String.to_integer(right)
   end
 
-  def get_invalid_ids(ids) do
+  def get_invalid_ids(ids, is_invalid_id) do
     ids
     |> String.splitter([","], [:trim])
     |> Enum.map(&parse_range/1)
     |> Enum.flat_map(& &1)
-    |> Enum.filter(&is_invalid_id/1)
+    |> Enum.filter(is_invalid_id)
   end
 
-  def sum_invalid_ids(ids) do
+  def sum_invalid_ids(ids, is_invalid_id) do
     ids
-    |> get_invalid_ids()
+    |> get_invalid_ids(is_invalid_id)
     |> Enum.reduce(&(&1 + &2))
   end
 
   def solve_part_one do
-    sum_invalid_ids(AocElixir.read_input(2))
+    sum_invalid_ids(AocElixir.read_input(2), &is_invalid_id_part_one/1)
+  end
+
+  def solve_part_two do
+    sum_invalid_ids(AocElixir.read_input(2), &is_invalid_id_part_two/1)
   end
 
   def main do
     IO.puts(~s"Part One: #{solve_part_one()}")
+    IO.puts(~s"Part Two: #{solve_part_two()}")
   end
 end
