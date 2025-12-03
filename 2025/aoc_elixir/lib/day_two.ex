@@ -64,9 +64,13 @@ defmodule DayTwo do
   def get_invalid_ids(ids, is_invalid_id) do
     ids
     |> String.splitter([","], [:trim])
-    |> Enum.map(&parse_range/1)
-    |> Enum.flat_map(& &1)
-    |> Enum.filter(is_invalid_id)
+    |> Task.async_stream(fn range ->
+      Enum.filter(parse_range(range), is_invalid_id)
+    end)
+    |> Enum.flat_map(fn result ->
+      {_status, datalist} = result
+      datalist
+    end)
   end
 
   def sum_invalid_ids(ids, is_invalid_id) do
