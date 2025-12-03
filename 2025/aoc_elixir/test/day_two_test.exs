@@ -22,12 +22,6 @@ defmodule DayTwoTest do
     assert not DayTwo.is_invalid_id_part_one(101)
   end
 
-  test "split_in_middle" do
-    assert DayTwo.split_in_middle("55") === {"5", "5"}
-    assert DayTwo.split_in_middle("64") === {"6", "4"}
-    assert DayTwo.split_in_middle("6464") === {"64", "64"}
-  end
-
   test "split multiple" do
     assert DayTwo.split_multiple("123456", 1) === ["1", "2", "3", "4", "5", "6"]
     assert DayTwo.split_multiple("123456", 2) === ["12", "34", "56"]
