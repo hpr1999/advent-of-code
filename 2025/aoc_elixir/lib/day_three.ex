@@ -1,31 +1,46 @@
 defmodule DayThree do
-  def calc_joltage(bat_bank) when is_integer(bat_bank) do
-    [first_num | rest] = find_max_digit_with_trail(bat_bank)
-    second_num = Enum.max(rest)
-
-    first_num * 10 + second_num
+  def calc_joltage(bat_bank, num_batteries) when is_integer(bat_bank) do
+    calc_joltage(Integer.digits(bat_bank), num_batteries, 0)
   end
 
-  def find_max_digit_with_trail(int) when is_integer(int) do
-    digits = Integer.digits(int)
-    find_max_digit_with_trail(digits, digits)
-  end
-
-  defp find_max_digit_with_trail(remaining_digits, result_digits) do
-    [max | _trail] = result_digits
-
-    case remaining_digits do
-      [_last] -> result_digits
-      [head | tail] when head > max -> find_max_digit_with_trail(tail, remaining_digits)
-      [head | tail] when head <= max -> find_max_digit_with_trail(tail, result_digits)
+  defp calc_joltage(bat_bank, num_batteries, sum)
+       when is_list(bat_bank) and num_batteries >= 0 and sum >= 0 do
+    if num_batteries == 1 do
+      sum + Enum.max(bat_bank)
+    else
+      [num | rest] = find_max_digit_with_trail(bat_bank, num_batteries)
+      calc_joltage(rest, num_batteries - 1, sum + num * Integer.pow(10, num_batteries - 1))
     end
   end
 
-  def sum_joltages(bat_banks) when is_list(bat_banks) do
+  def find_max_digit_with_trail(digits, min_trail_size) when is_list(digits) do
+    find_max_digit_with_trail(digits, digits, min_trail_size)
+  end
+
+  defp find_max_digit_with_trail(remaining_digits, result_digits, min_trail_size) do
+    [max | _trail] = result_digits
+
+    case remaining_digits do
+      list when is_list(list) and length(list) < min_trail_size ->
+        result_digits
+
+      [head | tail] when head > max ->
+        find_max_digit_with_trail(tail, remaining_digits, min_trail_size)
+
+      [head | tail] when head <= max ->
+        find_max_digit_with_trail(tail, result_digits, min_trail_size)
+    end
+  end
+
+  def solve_part_one(bat_banks) when is_list(bat_banks) do
     bat_banks
-    # |> Task.async_stream(&calc_joltage/1)
-    # |> Enum.sum_by(fn {:ok, joltage} -> joltage end)
-    |> Enum.map(&calc_joltage/1)
+    |> Enum.map(fn bat_bank -> calc_joltage(bat_bank, 2) end)
+    |> Enum.sum()
+  end
+
+  def solve_part_two(bat_banks) when is_list(bat_banks) do
+    bat_banks
+    |> Enum.map(fn bat_bank -> calc_joltage(bat_bank, 12) end)
     |> Enum.sum()
   end
 
@@ -33,10 +48,14 @@ defmodule DayThree do
     AocElixir.read_input(3)
     |> String.split("\n")
     |> Enum.map(&String.to_integer/1)
-    |> sum_joltages()
+    |> solve_part_one()
   end
 
   def solve_part_two() do
+    AocElixir.read_input(3)
+    |> String.split("\n")
+    |> Enum.map(&String.to_integer/1)
+    |> solve_part_two()
   end
 
   def main do
