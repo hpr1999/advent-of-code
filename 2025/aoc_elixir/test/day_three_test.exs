@@ -32,7 +32,7 @@ defmodule DayThreeTest do
   end
 
   test "part one" do
-    assert DayThree.solve_part_one([
+    assert DayThree.solve_p1([
              987_654_321_111_111,
              811_111_111_111_119,
              234_234_234_234_278,
@@ -41,7 +41,7 @@ defmodule DayThreeTest do
   end
 
   test "part two" do
-    assert DayThree.solve_part_two([
+    assert DayThree.solve_p2([
              987_654_321_111_111,
              811_111_111_111_119,
              234_234_234_234_278,
@@ -50,10 +50,10 @@ defmodule DayThreeTest do
   end
 
   test "solve part one" do
-    assert DayThree.solve_part_one() === 17445
+    assert DayThree.solve_p1() === 17_445
   end
 
   test "solve part two" do
-    assert DayThree.solve_part_two() === 173_229_689_350_551
+    assert DayThree.solve_p2() === 173_229_689_350_551
   end
 end

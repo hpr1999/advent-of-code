@@ -4,15 +4,15 @@ defmodule DayTwo do
   """
   require Integer
 
-  def is_invalid_id_part_one(id) when is_number(id) do
-    is_invalid_id_part_one(Integer.to_string(id))
+  def invalid_id_p1?(id) when is_number(id) do
+    invalid_id_p1?(Integer.to_string(id))
   end
 
-  def is_invalid_id_part_one(id) when is_binary(id) do
+  def invalid_id_p1?(id) when is_binary(id) do
     length = String.length(id)
 
     if rem(length, 2) == 0 do
-      is_invalid_id_with_repeat_length(id, 2)
+      has_repetition_of_length?(id, 2)
     else
       false
     end
@@ -23,19 +23,19 @@ defmodule DayTwo do
     String.split_at(str, middle_index)
   end
 
-  def is_invalid_id_part_two(id) when is_number(id) do
-    is_invalid_id_part_two(Integer.to_string(id))
+  def invalid_id_p2?(id) when is_number(id) do
+    invalid_id_p2?(Integer.to_string(id))
   end
 
-  def is_invalid_id_part_two(id) when is_binary(id) do
+  def invalid_id_p2?(id) when is_binary(id) do
     length = String.length(id)
 
     1..length
-    |> Enum.map(fn len -> is_invalid_id_with_repeat_length(id, len) end)
+    |> Enum.map(fn len -> has_repetition_of_length?(id, len) end)
     |> Enum.any?()
   end
 
-  def is_invalid_id_with_repeat_length(id, len) do
+  def has_repetition_of_length?(id, len) do
     length = String.length(id)
 
     if rem(length, len) == 0 do
@@ -79,16 +79,16 @@ defmodule DayTwo do
     |> Enum.reduce(&(&1 + &2))
   end
 
-  def solve_part_one do
-    sum_invalid_ids(AocElixir.read_input(2), &is_invalid_id_part_one/1)
+  def solve_p1 do
+    sum_invalid_ids(AocElixir.read_input(2), &invalid_id_p1?/1)
   end
 
-  def solve_part_two do
-    sum_invalid_ids(AocElixir.read_input(2), &is_invalid_id_part_two/1)
+  def solve_p2 do
+    sum_invalid_ids(AocElixir.read_input(2), &invalid_id_p2?/1)
   end
 
   def main do
-    IO.puts(~s"Part One: #{solve_part_one()}")
-    IO.puts(~s"Part Two: #{solve_part_two()}")
+    IO.puts(~s"Part One: #{solve_p1()}")
+    IO.puts(~s"Part Two: #{solve_p2()}")
   end
 end

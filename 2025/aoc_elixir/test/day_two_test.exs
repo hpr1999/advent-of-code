@@ -3,23 +3,23 @@ defmodule DayTwoTest do
   doctest DayTwo
 
   test "finds invalid id part one" do
-    assert DayTwo.is_invalid_id_part_one("55")
-    assert DayTwo.is_invalid_id_part_one("6464")
-    assert DayTwo.is_invalid_id_part_one("123123")
+    assert DayTwo.invalid_id_p1?("55")
+    assert DayTwo.invalid_id_p1?("6464")
+    assert DayTwo.invalid_id_p1?("123123")
 
-    assert not DayTwo.is_invalid_id_part_one("5")
-    assert not DayTwo.is_invalid_id_part_one("64")
-    assert not DayTwo.is_invalid_id_part_one("123")
-    assert not DayTwo.is_invalid_id_part_one("101")
+    assert not DayTwo.invalid_id_p1?("5")
+    assert not DayTwo.invalid_id_p1?("64")
+    assert not DayTwo.invalid_id_p1?("123")
+    assert not DayTwo.invalid_id_p1?("101")
 
-    assert DayTwo.is_invalid_id_part_one(55)
-    assert DayTwo.is_invalid_id_part_one(6464)
-    assert DayTwo.is_invalid_id_part_one(123_123)
+    assert DayTwo.invalid_id_p1?(55)
+    assert DayTwo.invalid_id_p1?(6464)
+    assert DayTwo.invalid_id_p1?(123_123)
 
-    assert not DayTwo.is_invalid_id_part_one(5)
-    assert not DayTwo.is_invalid_id_part_one(64)
-    assert not DayTwo.is_invalid_id_part_one(123)
-    assert not DayTwo.is_invalid_id_part_one(101)
+    assert not DayTwo.invalid_id_p1?(5)
+    assert not DayTwo.invalid_id_p1?(64)
+    assert not DayTwo.invalid_id_p1?(123)
+    assert not DayTwo.invalid_id_p1?(101)
   end
 
   test "split multiple" do
@@ -38,7 +38,7 @@ defmodule DayTwoTest do
     test_input =
       "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"
 
-    assert Enum.take(DayTwo.get_invalid_ids(test_input, &DayTwo.is_invalid_id_part_one/1), 8) ===
+    assert Enum.take(DayTwo.get_invalid_ids(test_input, &DayTwo.invalid_id_p1?/1), 8) ===
              [
                11,
                22,
@@ -55,38 +55,38 @@ defmodule DayTwoTest do
     test_input =
       "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"
 
-    assert DayTwo.sum_invalid_ids(test_input, &DayTwo.is_invalid_id_part_one/1) === 1_227_775_554
+    assert DayTwo.sum_invalid_ids(test_input, &DayTwo.invalid_id_p1?/1) === 1_227_775_554
   end
 
   test "solve part one" do
-    assert DayTwo.solve_part_one() === 53_420_042_388
+    assert DayTwo.solve_p1() === 53_420_042_388
   end
 
   test "finds invalid id part two" do
-    assert DayTwo.is_invalid_id_part_two("55")
-    assert DayTwo.is_invalid_id_part_two("6464")
-    assert DayTwo.is_invalid_id_part_two("123123")
+    assert DayTwo.invalid_id_p2?("55")
+    assert DayTwo.invalid_id_p2?("6464")
+    assert DayTwo.invalid_id_p2?("123123")
 
-    assert not DayTwo.is_invalid_id_part_two("5")
-    assert not DayTwo.is_invalid_id_part_two("64")
-    assert not DayTwo.is_invalid_id_part_two("123")
-    assert not DayTwo.is_invalid_id_part_two("101")
+    assert not DayTwo.invalid_id_p2?("5")
+    assert not DayTwo.invalid_id_p2?("64")
+    assert not DayTwo.invalid_id_p2?("123")
+    assert not DayTwo.invalid_id_p2?("101")
 
-    assert DayTwo.is_invalid_id_part_two(55)
-    assert DayTwo.is_invalid_id_part_two(6464)
-    assert DayTwo.is_invalid_id_part_two(123_123)
+    assert DayTwo.invalid_id_p2?(55)
+    assert DayTwo.invalid_id_p2?(6464)
+    assert DayTwo.invalid_id_p2?(123_123)
 
-    assert not DayTwo.is_invalid_id_part_two(5)
-    assert not DayTwo.is_invalid_id_part_two(64)
-    assert not DayTwo.is_invalid_id_part_two(123)
-    assert not DayTwo.is_invalid_id_part_two(101)
+    assert not DayTwo.invalid_id_p2?(5)
+    assert not DayTwo.invalid_id_p2?(64)
+    assert not DayTwo.invalid_id_p2?(123)
+    assert not DayTwo.invalid_id_p2?(101)
   end
 
   test "get_invalid_ids_part_two" do
     test_input =
       "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"
 
-    assert Enum.take(DayTwo.get_invalid_ids(test_input, &DayTwo.is_invalid_id_part_two/1), 100) ===
+    assert Enum.take(DayTwo.get_invalid_ids(test_input, &DayTwo.invalid_id_p2?/1), 100) ===
              [
                11,
                22,
@@ -108,10 +108,10 @@ defmodule DayTwoTest do
     test_input =
       "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"
 
-    assert DayTwo.sum_invalid_ids(test_input, &DayTwo.is_invalid_id_part_two/1) === 4_174_379_265
+    assert DayTwo.sum_invalid_ids(test_input, &DayTwo.invalid_id_p2?/1) === 4_174_379_265
   end
 
   test "solve part two" do
-    assert DayTwo.solve_part_two() === 69_553_832_684
+    assert DayTwo.solve_p2() === 69_553_832_684
   end
 end

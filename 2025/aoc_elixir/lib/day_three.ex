@@ -1,4 +1,7 @@
 defmodule DayThree do
+  @moduledoc """
+  Day Three of AOC
+  """
   def joltage(battery_bank, num_batteries) when is_integer(battery_bank) do
     joltage(Integer.digits(battery_bank), num_batteries, 0)
   end
@@ -31,26 +34,26 @@ defmodule DayThree do
     end
   end
 
-  def solve_part_one(battery_banks) when is_list(battery_banks) do
+  def solve_p1(battery_banks) when is_list(battery_banks) do
     battery_banks
     |> Enum.map(fn battery_bank -> joltage(battery_bank, 2) end)
     |> Enum.sum()
   end
 
-  def solve_part_two(battery_banks) when is_list(battery_banks) do
+  def solve_p2(battery_banks) when is_list(battery_banks) do
     battery_banks
     |> Enum.map(fn battery_bank -> joltage(battery_bank, 12) end)
     |> Enum.sum()
   end
 
-  def solve_part_one() do
+  def solve_p1() do
     AocElixir.read_input(3)
     |> String.split("\n")
     |> Enum.map(&String.to_integer/1)
-    |> solve_part_one()
+    |> solve_p1()
   end
 
-  def solve_part_two() do
+  def solve_p2() do
     AocElixir.read_input(3)
     |> String.split("\n")
     |> Task.async_stream(fn str ->
@@ -60,7 +63,7 @@ defmodule DayThree do
   end
 
   def main do
-    IO.puts(~s"Part One: #{solve_part_one()}")
-    IO.puts(~s"Part Two: #{solve_part_two()}")
+    IO.puts(~s"Part One: #{solve_p1()}")
+    IO.puts(~s"Part Two: #{solve_p2()}")
   end
 end

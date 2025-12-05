@@ -13,15 +13,11 @@ defmodule DayFour do
     |> Map.from_keys(1)
   end
 
-  def parse_grid(lines) when is_list(lines) do
+  def parse_grid(lines) do
     lines
     |> Enum.with_index()
     |> Enum.map(fn {val, index} -> parse_row(val, index) end)
     |> Enum.reduce(fn elem, acc -> Map.merge(elem, acc) end)
-  end
-
-  def parse_grid(grid_str) when is_binary(grid_str) do
-    parse_grid(String.split(grid_str, "\n"))
   end
 
   def neighbour_positions({x, y}) do
@@ -51,8 +47,9 @@ defmodule DayFour do
     |> Enum.count()
   end
 
-  def solve_part_one do
+  def solve_p1 do
     AocElixir.read_input(4)
+    |> String.split("\n")
     |> parse_grid()
     |> num_spots_with_filled_neighbours(3)
   end
@@ -70,21 +67,22 @@ defmodule DayFour do
     end
   end
 
-  def solve_part_two do
+  def solve_p2 do
     AocElixir.read_input(4)
+    |> String.split("\n")
     |> parse_grid()
     |> remove_spots_with_filled_neighbours(3)
   end
 
   def main do
-    IO.puts(~s"Part One: #{solve_part_one()}")
-    IO.puts(~s"Part Two: #{solve_part_two()}")
+    IO.puts(~s"Part One: #{solve_p1()}")
+    IO.puts(~s"Part Two: #{solve_p2()}")
   end
 
   def bench do
     Benchee.run(%{
-      "part one" => &solve_part_one/0,
-      "part two" => &solve_part_two/0
+      "part one" => &solve_p1/0,
+      "part two" => &solve_p2/0
     })
   end
 end

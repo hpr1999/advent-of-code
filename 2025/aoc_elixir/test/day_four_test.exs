@@ -66,6 +66,10 @@ defmodule DayFourTest do
   end
 
   test "part one" do
-    assert DayFour.solve_part_one() === 1480
+    assert DayFour.solve_p1() === 1480
+  end
+
+  test "part two" do
+    assert DayFour.solve_p2() === 8899
   end
 end
