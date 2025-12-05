@@ -80,4 +80,11 @@ defmodule DayFour do
     IO.puts(~s"Part One: #{solve_part_one()}")
     IO.puts(~s"Part Two: #{solve_part_two()}")
   end
+
+  def bench do
+    Benchee.run(%{
+      "part one" => &solve_part_one/0,
+      "part two" => &solve_part_two/0
+    })
+  end
 end
