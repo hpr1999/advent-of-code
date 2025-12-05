@@ -5,9 +5,9 @@ defmodule DayFour do
 
   def parse_row(line, row_num) do
     line
-    |> String.codepoints()
+    |> String.to_charlist()
     |> Enum.with_index()
-    |> Enum.filter(fn {val, _index} -> val === "@" end)
+    |> Enum.filter(fn {val, _index} -> val === ?@ end)
     |> Enum.map(fn {_val, index} -> index end)
     |> Enum.map(fn col -> {row_num, col} end)
     |> Map.from_keys(1)
