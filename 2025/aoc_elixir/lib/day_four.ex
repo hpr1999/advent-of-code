@@ -57,8 +57,27 @@ defmodule DayFour do
     |> num_spots_with_filled_neighbours(3)
   end
 
+  def remove_spots_with_filled_neighbours(map, max_neighbours) do
+    removable = spots_with_filled_neighbours(map, max_neighbours)
+
+    case removable do
+      [] ->
+        0
+
+      _list ->
+        Enum.count(removable) +
+          remove_spots_with_filled_neighbours(Map.drop(map, removable), max_neighbours)
+    end
+  end
+
+  def solve_part_two do
+    AocElixir.read_input(4)
+    |> parse_grid()
+    |> remove_spots_with_filled_neighbours(3)
+  end
+
   def main do
     IO.puts(~s"Part One: #{solve_part_one()}")
-    # IO.puts(~s"Part Two: #{solve_part_two()}")
+    IO.puts(~s"Part Two: #{solve_part_two()}")
   end
 end

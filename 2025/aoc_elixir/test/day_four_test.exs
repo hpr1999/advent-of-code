@@ -47,6 +47,24 @@ defmodule DayFourTest do
     assert DayFour.num_spots_with_filled_neighbours(map, 3) === 13
   end
 
+  test "remove spots with filled neighbours" do
+    map =
+      DayFour.parse_grid([
+        "..@@.@@@@.",
+        "@@@.@.@.@@",
+        "@@@@@.@.@@",
+        "@.@@@@..@.",
+        "@@.@@@@.@@",
+        ".@@@@@@@.@",
+        ".@.@.@.@@@",
+        "@.@@@.@@@@",
+        ".@@@@@@@@.",
+        "@.@.@@@.@."
+      ])
+
+    assert DayFour.remove_spots_with_filled_neighbours(map, 3) === 43
+  end
+
   test "part one" do
     assert DayFour.solve_part_one() === 1480
   end
