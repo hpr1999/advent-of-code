@@ -5,16 +5,34 @@ defmodule DaySix do
   import Benchee
 
   def parse() do
+    parse(AocElixir.read_input(6))
   end
 
   def parse(input) do
+    {lines, [ops]} =
+      input |> String.split("\n") |> Enum.map(&String.split/1) |> Enum.split(-1)
+
+    lines = lines |> Enum.map(fn line -> line |> Enum.map(&String.to_integer/1) end)
+    ops = ops |> Enum.map(&parse_op/1)
+
+    {lines, ops}
   end
 
-  def part1(input) do
+  def part1({num_rows, ops}) do
+    num_rows
+    |> Enum.reduce(&combine(&1, &2, ops))
+    |> Enum.sum()
   end
 
   def part2(input) do
   end
+
+  def combine(row1, row2, fns) do
+    Enum.zip_with([row1, row2, fns], fn [a, b, op] -> op.(a, b) end)
+  end
+
+  def parse_op(op) when op === "+", do: &Kernel.+/2
+  def parse_op(op) when op === "*", do: &Kernel.*/2
 
   ### BORING PLUMBING ###
 
