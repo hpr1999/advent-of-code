@@ -8,7 +8,7 @@ defmodule DayFive do
   defp map_ranges({new_from, new_to}, {current_from, current_to}) do
     if contains?({current_from, current_to}, new_from) do
       # don't add the element just yet, instead merge it into accumulator, we're gathering a bigger range
-      {[], {current_from, new_to}}
+      {[], {current_from, max(new_to, current_to)}}
     else
       # stop gathering the current range and add it into the list, start gathering the new range as the accumulator to check merges for next elements
       {[{current_from, current_to}], {new_from, new_to}}
@@ -38,10 +38,15 @@ defmodule DayFive do
   end
 
   def fresh?(fresh_ranges, num) do
-    fresh_ranges
-    |> Enum.take_while(fn {from, _to} -> from <= num end)
-    |> Enum.any?(&contains?(&1, num))
+    range =
+      fresh_ranges
+      |> Enum.find(&contains?(&1, num))
+
+    if range == nil, do: false, else: true
   end
+
+  def to_str({from, to}), do: ~s"from: #{from}, to: #{to}"
+  def to_str(nil), do: "not"
 
   def num_fresh(fresh_ranges, test_nums) do
     Enum.count(test_nums, &fresh?(fresh_ranges, &1))
@@ -54,6 +59,7 @@ defmodule DayFive do
       |> Enum.map(&String.split(&1, "\n"))
 
     fresh_ranges = fresh_lines |> parse_fresh() |> compact_ranges()
+
     test_nums = test_lines |> Enum.map(&String.to_integer/1)
     num_fresh(fresh_ranges, test_nums)
   end
@@ -61,6 +67,14 @@ defmodule DayFive do
   def main do
     input = AocElixir.read_input(5)
     IO.puts(~s"Part One: #{solve_p1(input)}")
-    # IO.puts(~s"Part Two: #{solve_p2(input)}")
+  end
+
+  def bench do
+    input = AocElixir.read_input(5)
+
+    Benchee.run(%{
+      "part one" => fn -> solve_p1(input) end
+      # "part two" => &solve_p2/0
+    })
   end
 end
