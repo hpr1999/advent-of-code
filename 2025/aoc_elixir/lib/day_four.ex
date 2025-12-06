@@ -2,6 +2,7 @@ defmodule DayFour do
   @moduledoc """
   Day Four of AOC
   """
+  import Benchee
 
   def parse_row(line, row_num) do
     line
@@ -80,7 +81,7 @@ defmodule DayFour do
   end
 
   def bench do
-    Benchee.run(%{
+    run(%{
       "part one" => &solve_p1/0,
       "part two" => &solve_p2/0
     })

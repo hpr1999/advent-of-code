@@ -2,6 +2,7 @@ defmodule DayFive do
   @moduledoc """
   Day Five of AOC
   """
+  import Benchee
 
   defp map_ranges(range, :default), do: {[], range}
 
@@ -86,9 +87,9 @@ defmodule DayFive do
   def bench do
     input = AocElixir.read_input(5)
 
-    Benchee.run(%{
       "part one" => fn -> solve_p1(input) end,
       "part two" => fn -> solve_p2(input) end
+    run(%{
     })
   end
 end
