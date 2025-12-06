@@ -45,6 +45,8 @@ defmodule DayFive do
     if range == nil, do: false, else: true
   end
 
+  def num_ids({from, to}), do: to - from + 1
+
   def to_str({from, to}), do: ~s"from: #{from}, to: #{to}"
   def to_str(nil), do: "not"
 
@@ -64,17 +66,29 @@ defmodule DayFive do
     num_fresh(fresh_ranges, test_nums)
   end
 
+  def solve_p2(input) do
+    [fresh_lines, _test_lines] =
+      input
+      |> String.split("\n\n")
+      |> Enum.map(&String.split(&1, "\n"))
+
+    fresh_ranges = fresh_lines |> parse_fresh() |> compact_ranges()
+
+    fresh_ranges |> Enum.map(&num_ids(&1)) |> Enum.sum()
+  end
+
   def main do
     input = AocElixir.read_input(5)
     IO.puts(~s"Part One: #{solve_p1(input)}")
+    IO.puts(~s"Part Two: #{solve_p2(input)}")
   end
 
   def bench do
     input = AocElixir.read_input(5)
 
     Benchee.run(%{
-      "part one" => fn -> solve_p1(input) end
-      # "part two" => &solve_p2/0
+      "part one" => fn -> solve_p1(input) end,
+      "part two" => fn -> solve_p2(input) end
     })
   end
 end
