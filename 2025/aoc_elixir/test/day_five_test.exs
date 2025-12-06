@@ -4,14 +4,14 @@ defmodule DayFiveTest do
 
   test "parse_fresh" do
     ranges = ["3-5", "10-14", "16-20", "12-18"]
-    assert DayFive.parse_fresh(ranges) === [{3, 5}, {10, 14}, {12, 18}, {16, 20}]
+    assert DayFive.parse_fresh(ranges) === [{3, 5}, {10, 14}, {16, 20}, {12, 18}]
   end
 
   test "compact ranges" do
     assert DayFive.compact_ranges([{3, 5}, {10, 14}, {12, 18}, {16, 20}]) === [{3, 5}, {10, 20}]
   end
 
-  test "solve p1" do
+  test "p1 demo" do
     str = """
     3-5
     10-14
@@ -26,10 +26,10 @@ defmodule DayFiveTest do
     32\
     """
 
-    assert DayFive.solve_p1(str) === 3
+    assert DayFive.part1(DayFive.parse(str)) === 3
   end
 
-  test "solve p2" do
+  test "p2 demo" do
     str = """
     3-5
     10-14
@@ -44,14 +44,14 @@ defmodule DayFiveTest do
     32\
     """
 
-    assert DayFive.solve_p2(str) === 14
+    assert DayFive.part2(DayFive.parse(str)) === 14
   end
 
   test "p1 solution" do
-    DayFive.solve_p1(AocElixir.read_input(5)) === 505
+    assert DayFive.solve_part1() == 505
   end
 
   test "p2 solution" do
-    DayFive.solve_p2(AocElixir.read_input(5)) === 344_423_158_480_189
+    assert DayFive.solve_part2() === 344_423_158_480_189
   end
 end

@@ -4,6 +4,24 @@ defmodule DayFive do
   """
   import Benchee
 
+  ### PARSING ###
+
+  def parse, do: parse(AocElixir.read_input(5))
+
+  def parse(input) do
+    [fresh_lines, test_lines] =
+      input
+      |> String.split("\n\n")
+      |> Enum.map(&String.split(&1, "\n"))
+
+    fresh_ranges = fresh_lines |> parse_fresh() |> compact_ranges()
+    test_ids = test_lines |> Enum.map(&String.to_integer/1)
+
+    {fresh_ranges, test_ids}
+  end
+
+  defp contains?({from, to}, num), do: from <= num and num <= to
+
   defp map_ranges(range, :default), do: {[], range}
 
   defp map_ranges({new_from, new_to}, {current_from, current_to}) do
@@ -31,65 +49,39 @@ defmodule DayFive do
     range_lines
     |> Enum.map(&String.split(&1, "-"))
     |> Enum.map(fn [from, to] -> {String.to_integer(from), String.to_integer(to)} end)
-    |> Enum.sort_by(fn {from, _to} -> from end)
   end
 
-  def contains?({from, to}, num) do
-    from <= num and num <= to
-  end
+  ### PART 1 ###
 
-  def fresh?(fresh_ranges, num) do
-    range =
-      fresh_ranges
-      |> Enum.find(&contains?(&1, num))
+  def fresh?(fresh_ranges, num), do: Enum.any?(fresh_ranges, &contains?(&1, num))
 
-    if range == nil, do: false, else: true
-  end
+  def part1({fresh_ranges, test_nums}), do: Enum.count(test_nums, &fresh?(fresh_ranges, &1))
 
-  def num_ids({from, to}), do: to - from + 1
+  ### PART 2 ###
 
-  def to_str({from, to}), do: ~s"from: #{from}, to: #{to}"
-  def to_str(nil), do: "not"
+  defp num_ids({from, to}), do: to - from + 1
 
-  def num_fresh(fresh_ranges, test_nums) do
-    Enum.count(test_nums, &fresh?(fresh_ranges, &1))
-  end
+  def part2({fresh_ranges, _test_nums}), do: fresh_ranges |> Enum.sum_by(&num_ids(&1))
 
-  def solve_p1(input) do
-    [fresh_lines, test_lines] =
-      input
-      |> String.split("\n\n")
-      |> Enum.map(&String.split(&1, "\n"))
+  ### BORING PLUMBING ###
 
-    fresh_ranges = fresh_lines |> parse_fresh() |> compact_ranges()
-
-    test_nums = test_lines |> Enum.map(&String.to_integer/1)
-    num_fresh(fresh_ranges, test_nums)
-  end
-
-  def solve_p2(input) do
-    [fresh_lines, _test_lines] =
-      input
-      |> String.split("\n\n")
-      |> Enum.map(&String.split(&1, "\n"))
-
-    fresh_ranges = fresh_lines |> parse_fresh() |> compact_ranges()
-
-    fresh_ranges |> Enum.map(&num_ids(&1)) |> Enum.sum()
-  end
+  def solve_part1, do: parse() |> part1()
+  def solve_part2, do: parse() |> part2()
 
   def main do
-    input = AocElixir.read_input(5)
-    IO.puts(~s"Part One: #{solve_p1(input)}")
-    IO.puts(~s"Part Two: #{solve_p2(input)}")
+    input = parse()
+
+    IO.puts(~s"Part One: #{part1(input)}")
+    IO.puts(~s"Part Two: #{part2(input)}")
   end
 
   def bench do
-    input = AocElixir.read_input(5)
+    input = parse()
 
-      "part one" => fn -> solve_p1(input) end,
-      "part two" => fn -> solve_p2(input) end
     run(%{
+      "parse" => fn -> parse(AocElixir.read_input(5)) end,
+      "part one" => fn -> part1(input) end,
+      "part two" => fn -> part2(input) end
     })
   end
 end
