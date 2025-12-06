@@ -28,4 +28,8 @@ defmodule DaySixTest do
 
     assert part1(parse(input)) === 4_277_556
   end
+
+  test "p1 solve" do
+    assert part1(parse()) === 4_951_502_530_386
+  end
 end

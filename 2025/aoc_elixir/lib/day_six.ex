@@ -19,20 +19,25 @@ defmodule DaySix do
   end
 
   def part1({num_rows, ops}) do
-    num_rows
-    |> Enum.reduce(&combine(&1, &2, ops))
+    num_columns = num_rows |> Enum.zip()
+
+    [num_columns, ops]
+    # associate each column with its operation
+    |> Enum.zip()
+    # apply operation
+    |> Enum.map(fn {num_tpl, op} -> op.(num_tpl) end)
     |> Enum.sum()
   end
 
-  def part2(input) do
+  def part2({num_rows, ops}) do
   end
 
   def combine(row1, row2, fns) do
     Enum.zip_with([row1, row2, fns], fn [a, b, op] -> op.(a, b) end)
   end
 
-  def parse_op(op) when op === "+", do: &Kernel.+/2
-  def parse_op(op) when op === "*", do: &Kernel.*/2
+  def parse_op(op) when op === "+", do: &Tuple.sum/1
+  def parse_op(op) when op === "*", do: &Tuple.product/1
 
   ### BORING PLUMBING ###
 
