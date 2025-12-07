@@ -80,11 +80,11 @@ defmodule DayTwo do
   end
 
   def solve_p1 do
-    sum_invalid_ids(AocElixir.read_input(2), &invalid_id_p1?/1)
+    sum_invalid_ids(AocElixir.read_input(2) |> String.trim(), &invalid_id_p1?/1)
   end
 
   def solve_p2 do
-    sum_invalid_ids(AocElixir.read_input(2), &invalid_id_p2?/1)
+    sum_invalid_ids(AocElixir.read_input(2) |> String.trim(), &invalid_id_p2?/1)
   end
 
   def main do

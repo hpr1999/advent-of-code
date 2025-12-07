@@ -47,15 +47,13 @@ defmodule DayThree do
   end
 
   def solve_p1() do
-    AocElixir.read_input(3)
-    |> String.split("\n")
+    AocElixir.read_lines(3)
     |> Enum.map(&String.to_integer/1)
     |> solve_p1()
   end
 
   def solve_p2() do
-    AocElixir.read_input(3)
-    |> String.split("\n")
+    AocElixir.read_lines(3)
     |> Task.async_stream(fn str ->
       joltage(String.to_integer(str), 12)
     end)

@@ -6,7 +6,7 @@ defmodule DayFive do
 
   ### PARSING ###
 
-  def parse, do: parse(AocElixir.read_input(5))
+  def parse, do: parse(String.trim(AocElixir.read_input(5)))
 
   def parse(input) do
     [fresh_lines, test_lines] =
