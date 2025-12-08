@@ -4,7 +4,7 @@ defmodule DayEightTest do
 
   import DayEight
 
-  defp demo_input(),
+  def demo_input(),
     do: [
       {162, 817, 812},
       {57, 618, 57},

@@ -35,41 +35,36 @@ defmodule DayEight do
     |> Enum.product()
   end
 
+  def find_remove(enum, condition, results \\ {nil, []})
+
+  def find_remove([], _, {element, list}), do: {element, list}
+
+  def find_remove([head | tail], condition, {element, list}) do
+    if condition.(head) do
+      find_remove(tail, condition, {head, list})
+    else
+      find_remove(tail, condition, {element, [head | list]})
+    end
+  end
+
   def connect_to_circuits(connection, circuits) do
     {left, right} = connection
 
-    existing_circuits_left = Enum.filter(circuits, &Enum.member?(&1, left))
-    existing_circuits_right = Enum.filter(circuits, &Enum.member?(&1, right))
+    {existing_circuit_left, circuits} = find_remove(circuits, &Enum.member?(&1, left))
+    {existing_circuit_right, circuits} = find_remove(circuits, &Enum.member?(&1, right))
 
-    connect_circuits = fn circuits ->
-      Enum.flat_map(circuits, fn circuit -> circuit end) |> Enum.uniq()
-    end
-
-    case {existing_circuits_left, existing_circuits_right} do
-      {[], []} ->
+    case {existing_circuit_left, existing_circuit_right} do
+      {nil, nil} ->
         [[left, right] | circuits]
 
-      {_, []} ->
-        new_circuit = [right | connect_circuits.(existing_circuits_left)]
-        without_old_circuits = circuits -- existing_circuits_left
+      {_, nil} ->
+        [Enum.uniq([right | existing_circuit_left]) | circuits]
 
-        [new_circuit | without_old_circuits]
-
-      {[], _} ->
-        new_circuit = [left | connect_circuits.(existing_circuits_right)]
-        without_old_circuits = circuits -- existing_circuits_right
-
-        [new_circuit | without_old_circuits]
+      {nil, _} ->
+        [Enum.uniq([left | existing_circuit_right]) | circuits]
 
       {_, _} ->
-        lefts = connect_circuits.(existing_circuits_left)
-        rights = connect_circuits.(existing_circuits_right)
-        new_circuit = (lefts ++ rights) |> Enum.uniq()
-
-        without_old_circuits = circuits -- existing_circuits_left
-        without_old_circuits = without_old_circuits -- existing_circuits_right
-
-        [new_circuit | without_old_circuits]
+        [Enum.uniq(existing_circuit_left ++ existing_circuit_right) | circuits]
     end
   end
 
