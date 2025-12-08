@@ -40,4 +40,8 @@ defmodule DayEightTest do
   test "solve p1" do
     assert part1(parse()) === 79056
   end
+
+  test "solve p2" do
+    assert part2(parse()) === 4_639_477
+  end
 end

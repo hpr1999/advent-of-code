@@ -22,7 +22,6 @@ defmodule DayEight do
 
   ### PART ONE ###
   def part1(junctions, num_connections \\ 1000) do
-    # avoid duplicates a -> b and b -> a by taking only half after sorting
     shortest_distances = shortest_distances(junctions)
 
     connections = Enum.take(shortest_distances, num_connections)
@@ -36,42 +35,46 @@ defmodule DayEight do
     |> Enum.product()
   end
 
+  def connect_to_circuits(connection, circuits) do
+    {left, right} = connection
+
+    existing_circuits_left = Enum.filter(circuits, &Enum.member?(&1, left))
+    existing_circuits_right = Enum.filter(circuits, &Enum.member?(&1, right))
+
+    connect_circuits = fn circuits ->
+      Enum.flat_map(circuits, fn circuit -> circuit end) |> Enum.uniq()
+    end
+
+    case {existing_circuits_left, existing_circuits_right} do
+      {[], []} ->
+        [[left, right] | circuits]
+
+      {_, []} ->
+        new_circuit = [right | connect_circuits.(existing_circuits_left)]
+        without_old_circuits = circuits -- existing_circuits_left
+
+        [new_circuit | without_old_circuits]
+
+      {[], _} ->
+        new_circuit = [left | connect_circuits.(existing_circuits_right)]
+        without_old_circuits = circuits -- existing_circuits_right
+
+        [new_circuit | without_old_circuits]
+
+      {_, _} ->
+        lefts = connect_circuits.(existing_circuits_left)
+        rights = connect_circuits.(existing_circuits_right)
+        new_circuit = (lefts ++ rights) |> Enum.uniq()
+
+        without_old_circuits = circuits -- existing_circuits_left
+        without_old_circuits = without_old_circuits -- existing_circuits_right
+
+        [new_circuit | without_old_circuits]
+    end
+  end
+
   def make_circuits(connections) do
-    Enum.reduce(connections, [], fn {left, right}, circuits ->
-      existing_circuits_left = Enum.filter(circuits, &Enum.member?(&1, left))
-      existing_circuits_right = Enum.filter(circuits, &Enum.member?(&1, right))
-
-      connect_circuits = fn circuits ->
-        Enum.flat_map(circuits, fn circuit -> circuit end) |> Enum.uniq()
-      end
-
-      case {existing_circuits_left, existing_circuits_right} do
-        {[], []} ->
-          [[left, right] | circuits]
-
-        {_, []} ->
-          new_circuit = [right | connect_circuits.(existing_circuits_left)]
-          without_old_circuits = circuits -- existing_circuits_left
-
-          [new_circuit | without_old_circuits]
-
-        {[], _} ->
-          new_circuit = [left | connect_circuits.(existing_circuits_right)]
-          without_old_circuits = circuits -- existing_circuits_right
-
-          [new_circuit | without_old_circuits]
-
-        {_, _} ->
-          lefts = connect_circuits.(existing_circuits_left)
-          rights = connect_circuits.(existing_circuits_right)
-          new_circuit = (lefts ++ rights) |> Enum.uniq()
-
-          without_old_circuits = circuits -- existing_circuits_left
-          without_old_circuits = without_old_circuits -- existing_circuits_right
-
-          [new_circuit | without_old_circuits]
-      end
-    end)
+    Enum.reduce(connections, [], &connect_to_circuits/2)
   end
 
   def distance({point_a, point_b}), do: distance(point_a, point_b)
@@ -93,7 +96,23 @@ defmodule DayEight do
   end
 
   ### PART 2 ###
-  def part2(input) do
+  def part2(junctions) do
+    shortest_distances = shortest_distances(junctions)
+
+    last_connection =
+      Enum.reduce_while(shortest_distances, [], fn connection, circuits ->
+        new_circuits = connect_to_circuits(connection, circuits)
+
+        if Enum.empty?(tl(new_circuits)) and
+             Enum.all?(junctions, &Enum.member?(hd(new_circuits), &1)) do
+          {:halt, connection}
+        else
+          {:cont, new_circuits}
+        end
+      end)
+
+    {{x1, _y1, _z1}, {x2, _y2, _z2}} = last_connection
+    x1 * x2
   end
 
   ### BORING PLUMBING ###
