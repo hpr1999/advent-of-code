@@ -36,4 +36,8 @@ defmodule DayEightTest do
   test "demo p1" do
     assert part1(demo_input(), 10) === 40
   end
+
+  test "solve p1" do
+    assert part1(parse()) === 79056
+  end
 end

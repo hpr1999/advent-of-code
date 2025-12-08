@@ -62,8 +62,9 @@ defmodule DayEight do
           [new_circuit | without_old_circuits]
 
         {_, _} ->
-          new_circuit = connect_circuits.(existing_circuits_left)
-          new_circuit = new_circuit ++ connect_circuits.(existing_circuits_right)
+          lefts = connect_circuits.(existing_circuits_left)
+          rights = connect_circuits.(existing_circuits_right)
+          new_circuit = (lefts ++ rights) |> Enum.uniq()
 
           without_old_circuits = circuits -- existing_circuits_left
           without_old_circuits = without_old_circuits -- existing_circuits_right
