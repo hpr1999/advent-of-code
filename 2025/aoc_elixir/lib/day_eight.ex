@@ -98,13 +98,13 @@ defmodule DayEight do
   ### PART 2 ###
   def part2(junctions) do
     shortest_distances = shortest_distances(junctions)
+    num_junctions = Enum.count(junctions)
 
     last_connection =
       Enum.reduce_while(shortest_distances, [], fn connection, circuits ->
         new_circuits = connect_to_circuits(connection, circuits)
 
-        if Enum.empty?(tl(new_circuits)) and
-             Enum.all?(junctions, &Enum.member?(hd(new_circuits), &1)) do
+        if Enum.empty?(tl(new_circuits)) and Enum.count(hd(new_circuits)) === num_junctions do
           {:halt, connection}
         else
           {:cont, new_circuits}
