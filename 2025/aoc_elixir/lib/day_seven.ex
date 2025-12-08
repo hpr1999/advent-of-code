@@ -66,8 +66,27 @@ defmodule DaySeven do
 
   def join_chunks(chunks, join_fun), do: join_chunks(chunks, [], join_fun, [])
 
-  def part1(input) do
-    input
+  # vals: {upper_char, lower_char}
+  def advance_beam(vals) do
+    case vals do
+      {?S, ?.} -> [?., ?|, ?.]
+      {?|, ?^} -> [?|, ?^, ?|]
+      {?|, ?.} -> [?., ?|, ?.]
+      {?., ?^} -> [?., ?^, ?.]
+      {_, ?.} -> [?., ?., ?.]
+    end
+  end
+
+  def choose_char_from_options(list_of_chars) do
+    cond do
+      Enum.member?(list_of_chars, ?^) -> ?^
+      Enum.member?(list_of_chars, ?|) -> ?|
+      Enum.member?(list_of_chars, ?.) -> ?.
+    end
+  end
+
+  def simulate_beam(input_lines) do
+    input_lines
     |> Enum.reduce([], fn line, result ->
       if Enum.empty?(result) do
         [line | result]
@@ -76,37 +95,104 @@ defmodule DaySeven do
 
         new_line =
           Enum.zip(prev_line, line)
-          |> Enum.map(fn vals ->
-            case vals do
-              {?S, ?.} -> [?., ?|, ?.]
-              {?|, ?^} -> [?|, ?^, ?|]
-              {?|, ?.} -> [?., ?|, ?.]
-              {?., ?^} -> [?., ?^, ?.]
-              {_, ?.} -> [?., ?., ?.]
-            end
-          end)
-          |> join_chunks(fn chars ->
-            if Enum.member?(chars, ?^) do
-              ?^
-            else
-              if Enum.member?(chars, ?|) do
-                ?|
-              else
-                ?.
-              end
-            end
-          end)
+          |> Enum.map(&advance_beam/1)
+          |> join_chunks(&choose_char_from_options/1)
+          # because we're generating 3-tuples for each char, we need to remove the first and last generated, which are not collapsed by join_chunks
           |> Enum.drop(1)
+          # we're building in reverse because of linked lists, so reverse
           |> Enum.reverse()
 
         [tl(new_line) | result]
       end
     end)
+    # we're building in reverse because of linked lists, so reverse
     |> Enum.reverse()
   end
 
+  def count_splits(input_lines) do
+    input_lines
+    # columnwise
+    |> Enum.zip()
+    |> Enum.map(fn col ->
+      sliding_window_chunks(Tuple.to_list(col), 2)
+      |> Enum.count(fn [upper, lower] -> upper === ?| and lower === ?^ end)
+    end)
+    |> Enum.sum()
+  end
+
+  def part1(input_lines) do
+    input_lines
+    |> simulate_beam()
+    |> count_splits()
+  end
+
   ### PART 2 ###
+
+  # vals: {upper_char, lower_char}
+  def advance_quantum_beam(vals) do
+    case vals do
+      {?S, ?.} -> [[?., ?|, ?.]]
+      {?|, ?^} -> [[?|, ?^, ?.], [?., ?^, ?|]]
+      {?|, ?.} -> [[?., ?|, ?.]]
+      {?., ?^} -> [[?., ?^, ?.]]
+      {_, ?.} -> [[?., ?., ?.]]
+    end
+  end
+
+  def permutations(list_of_lists) do
+    Enum.reduce(Enum.reverse(list_of_lists), [[]], fn options, permutations ->
+      Enum.flat_map(options, fn option ->
+        Enum.map(permutations, fn permutation ->
+          [option | permutation]
+        end)
+      end)
+    end)
+  end
+
+  def simulate_quantum_beam(input_lines) do
+    input_lines
+    |> Enum.reduce([], fn line, results ->
+      if Enum.empty?(results) do
+        [{[line], 1}]
+      else
+        new_results =
+          Enum.flat_map(results, fn {result_lines, sources} ->
+            prev_line = hd(result_lines)
+
+            new_quantum_lines =
+              Enum.zip(prev_line, line)
+              |> Enum.map(&advance_quantum_beam/1)
+              |> permutations()
+              |> Enum.map(fn permutation ->
+                permutation
+                |> join_chunks(&choose_char_from_options/1)
+                # because we're generating 3-tuples for each char, we need to remove the first and last generated, which are not collapsed by join_chunks
+                |> Enum.drop(1)
+                # we're building in reverse because of linked lists, so reverse
+                |> Enum.reverse()
+                |> Enum.drop(1)
+              end)
+
+            Enum.map(new_quantum_lines, fn new_line -> {[new_line | result_lines], sources} end)
+          end)
+
+        new_results
+        |> Enum.uniq_by(fn {result_lines, _} -> hd(result_lines) end)
+        |> Enum.map(fn {result_lines, _} ->
+          {result_lines,
+           Enum.filter(new_results, fn res -> hd(elem(res, 0)) === hd(result_lines) end)
+           |> Enum.sum_by(&elem(&1, 1))}
+        end)
+      end
+    end)
+    # we're building in reverse because of linked lists, so reverse
+    |> Enum.map(fn {result_lines, sources} -> {Enum.reverse(result_lines), sources} end)
+  end
+
   def part2(input) do
+    input
+    |> simulate_quantum_beam()
+    |> Enum.sum_by(fn {_, sources} -> sources end)
   end
 
   ### BORING PLUMBING ###
