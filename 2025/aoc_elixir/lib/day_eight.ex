@@ -11,11 +11,84 @@ defmodule DayEight do
     parse(AocElixir.read_lines(8))
   end
 
+  def line_to_point(line) do
+    [x, y, z] = String.split(line, ",") |> Enum.map(&String.to_integer/1)
+    {x, y, z}
+  end
+
   def parse(lines) do
+    lines |> Enum.map(&line_to_point/1)
   end
 
   ### PART ONE ###
-  def part1(input_lines) do
+  def part1(junctions, num_connections \\ 1000) do
+    # avoid duplicates a -> b and b -> a by taking only half after sorting
+    shortest_distances = shortest_distances(junctions)
+
+    connections = Enum.take(shortest_distances, num_connections)
+
+    circuits = make_circuits(connections)
+
+    circuits
+    |> Enum.map(&Enum.count/1)
+    |> Enum.sort()
+    |> Enum.take(-3)
+    |> Enum.product()
+  end
+
+  def make_circuits(connections) do
+    Enum.reduce(connections, [], fn {left, right}, circuits ->
+      existing_circuits_left = Enum.filter(circuits, &Enum.member?(&1, left))
+      existing_circuits_right = Enum.filter(circuits, &Enum.member?(&1, right))
+
+      connect_circuits = fn circuits ->
+        Enum.flat_map(circuits, fn circuit -> circuit end) |> Enum.uniq()
+      end
+
+      case {existing_circuits_left, existing_circuits_right} do
+        {[], []} ->
+          [[left, right] | circuits]
+
+        {_, []} ->
+          new_circuit = [right | connect_circuits.(existing_circuits_left)]
+          without_old_circuits = circuits -- existing_circuits_left
+
+          [new_circuit | without_old_circuits]
+
+        {[], _} ->
+          new_circuit = [left | connect_circuits.(existing_circuits_right)]
+          without_old_circuits = circuits -- existing_circuits_right
+
+          [new_circuit | without_old_circuits]
+
+        {_, _} ->
+          new_circuit = connect_circuits.(existing_circuits_left)
+          new_circuit = new_circuit ++ connect_circuits.(existing_circuits_right)
+
+          without_old_circuits = circuits -- existing_circuits_left
+          without_old_circuits = without_old_circuits -- existing_circuits_right
+
+          [new_circuit | without_old_circuits]
+      end
+    end)
+  end
+
+  def distance({point_a, point_b}), do: distance(point_a, point_b)
+
+  def distance({x1, y1, z1}, {x2, y2, z2}) do
+    ((x1 - x2) ** 2 + (y1 - y2) ** 2 + (z1 - z2) ** 2) ** 0.5
+  end
+
+  def pairs(anys, results \\ [])
+  def pairs([], results), do: results
+
+  def pairs([head | tail], results) do
+    ps = for el <- tail, do: {head, el}
+    pairs(tail, ps ++ results)
+  end
+
+  def shortest_distances(points) do
+    points |> pairs() |> Enum.sort_by(&distance/1)
   end
 
   ### PART 2 ###
