@@ -8,12 +8,12 @@ defmodule DayNine do
   ### PARSING ###
 
   def parse() do
-    parse(AocElixir.read_lines(8))
+    parse(AocElixir.read_lines(9))
   end
 
   def line_to_point(line) do
-    [x, y, z] = String.split(line, ",") |> Enum.map(&String.to_integer/1)
-    {x, y, z}
+    [x, y] = String.split(line, ",") |> Enum.map(&String.to_integer/1)
+    {x, y}
   end
 
   def parse(lines) do
@@ -32,13 +32,21 @@ defmodule DayNine do
     sublists(tail, [[head | tail] | results])
   end
 
-  def pairs(list) do
-    for sublist <- sublists(list), [a | tail] = sublist, b <- tail do
+  def pairs(list, condition) do
+    for sublist <- sublists(list), [a | tail] = sublist, b <- tail, condition.(a, b) do
       {a, b}
     end
   end
 
-  def part1(input) do
+  def area({{x1, y1}, {x2, y2}}) do
+    (abs(x1 - x2) + 1) * (abs(y1 - y2) + 1)
+  end
+
+  def part1(points) do
+    points
+    |> pairs(fn {x1, y1}, {x2, y2} -> x1 !== x2 and y1 !== y2 end)
+    |> Enum.map(&area/1)
+    |> Enum.max()
   end
 
   ### PART TWO ###
