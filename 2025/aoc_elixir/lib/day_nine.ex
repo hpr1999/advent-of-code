@@ -22,6 +22,22 @@ defmodule DayNine do
 
   ### PART ONE ###
 
+  def sublists(list, results \\ [])
+
+  def sublists([head], results) do
+    [[head] | results]
+  end
+
+  def sublists([head | tail], results) do
+    sublists(tail, [[head | tail] | results])
+  end
+
+  def pairs(list) do
+    for sublist <- sublists(list), [a | tail] = sublist, b <- tail do
+      {a, b}
+    end
+  end
+
   def part1(input) do
   end
 

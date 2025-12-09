@@ -78,12 +78,20 @@ defmodule DayEight do
     ((x1 - x2) ** 2 + (y1 - y2) ** 2 + (z1 - z2) ** 2) ** 0.5
   end
 
-  def pairs(anys, results \\ [])
-  def pairs([], results), do: results
+  def sublists(list, results \\ [])
 
-  def pairs([head | tail], results) do
-    ps = for el <- tail, do: {head, el}
-    pairs(tail, ps ++ results)
+  def sublists([head], results) do
+    [[head] | results]
+  end
+
+  def sublists([head | tail], results) do
+    sublists(tail, [[head | tail] | results])
+  end
+
+  def pairs(list) do
+    for sublist <- sublists(list), [a | tail] = sublist, b <- tail do
+      {a, b}
+    end
   end
 
   def shortest_distances(points) do
