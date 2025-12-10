@@ -23,4 +23,8 @@ defmodule DayNineTest do
   test "solve p1" do
     assert solve_part1() === 4_759_531_084
   end
+
+  test "demo p2" do
+    assert demo_input() |> part2() === 24
+  end
 end
