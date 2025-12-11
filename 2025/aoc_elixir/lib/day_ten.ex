@@ -80,18 +80,17 @@ defmodule DayTen do
   end
 
   def combinations(list, num) do
-    for head <- list,
-        rest_combinations = combinations(list, num - 1),
-        filtered_rest_combinations =
-          Enum.uniq_by(rest_combinations, fn combination -> Enum.sort(combination) end),
-        y <- filtered_rest_combinations do
-      [head | y]
-    end
+    Stream.flat_map(list, fn element ->
+      combinations(list, num - 1)
+      |> Stream.map(fn rest_combination ->
+        [element | rest_combination]
+      end)
+    end)
   end
 
   def button_combination_stream(%Machine{} = m) do
     Stream.iterate(1, &(&1 + 1))
-    |> Stream.flat_map(fn length ->
+    |> Stream.map(fn length ->
       m.buttons |> combinations(length)
     end)
   end
@@ -111,17 +110,27 @@ defmodule DayTen do
 
   def part1(machines) when is_list(machines) do
     button_solutions =
-      for %Machine{} = m <- machines do
-        button_combination_stream(m)
-        |> Enum.find(&solves_machine?(m.indicator_target, &1))
-      end
+      Task.async_stream(
+        machines,
+        fn %Machine{} = m ->
+          Task.async_stream(
+            button_combination_stream(m),
+            fn combo_generation ->
+              combo_generation |> Enum.find(&solves_machine?(m.indicator_target, &1))
+            end,
+            ordered: true,
+            timeout: :infinity,
+            max_concurrency: 2
+          )
+          |> Stream.map(fn {:ok, data} -> data end)
+          |> Enum.find(fn elem -> elem !== nil end)
+        end,
+        ordered: false,
+        timeout: :infinity
+      )
+      |> Stream.map(fn {:ok, data} -> data end)
 
     button_solutions |> Enum.map(&Enum.count/1) |> Enum.sum()
-
-    # get permutations of size n
-    # try them all
-    # check if any permutation will cause the machine to be fixed
-    # if yes, return, if not increase n
   end
 
   ### PART TWO ###
